@@ -1,0 +1,103 @@
+name: Build and push Xpra image
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  schedule:
+    - cron: "0 6 * * 1"   # weekly rebuild to pick up new Xpra releases
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: "Xpra repository channel"
+        type: choice
+        options: [xpra, xpra-beta]
+        default: xpra
+
+env:
+  # Set DOCKERHUB_USERNAME as a repository *variable* and
+  # DOCKERHUB_TOKEN as a repository *secret* (Settings > Secrets and variables > Actions)
+  IMAGE: docker.io/${{ vars.DOCKERHUB_USERNAME }}/xpra
+  XPRA_CHANNEL: ${{ inputs.channel || 'xpra' }}
+  # Add linux/arm64 if xpra.org publishes arm64 packages for noble
+  PLATFORMS: linux/amd64
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-qemu-action@v3
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build image for testing
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: xpra-test:ci
+          build-args: XPRA_CHANNEL=${{ env.XPRA_CHANNEL }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Check Xpra version is 5 or newer
+        id: version
+        run: |
+          out=$(docker run --rm --entrypoint xpra xpra-test:ci --version)
+          echo "$out"
+          ver=$(echo "$out" | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -1)
+          major=${ver%%.*}
+          if [ -z "$major" ] || [ "$major" -lt 5 ]; then
+            echo "::error::Expected Xpra 5 or newer, got '$ver'"
+            exit 1
+          fi
+          echo "xpra=$ver" >> "$GITHUB_OUTPUT"
+
+      - name: Smoke test the server
+        run: |
+          docker run -d --name xpra-smoke -p 14500:14500 xpra-test:ci
+          for i in $(seq 1 30); do
+            if curl -fsS -o /dev/null http://localhost:14500/; then
+              echo "HTML5 client is being served"; ok=1; break
+            fi
+            sleep 2
+          done
+          docker logs xpra-smoke
+          docker rm -f xpra-smoke
+          [ "$ok" = 1 ] || { echo "::error::Server did not come up"; exit 1; }
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=${{ steps.version.outputs.xpra }},enable={{is_default_branch}}
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+
+      - name: Log in to Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: ${{ env.PLATFORMS }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: XPRA_CHANNEL=${{ env.XPRA_CHANNEL }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
