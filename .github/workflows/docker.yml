@@ -16,9 +16,8 @@ on:
         default: xpra
 
 env:
-  # Set DOCKERHUB_USERNAME as a repository *variable* and
-  # DOCKERHUB_TOKEN as a repository *secret* (Settings > Secrets and variables > Actions)
-  IMAGE: docker.io/${{ vars.DOCKERHUB_USERNAME }}/xpra
+  # Published to GitHub Container Registry; no extra secrets needed
+  IMAGE: ghcr.io/${{ github.repository }}
   XPRA_CHANNEL: ${{ inputs.channel || 'xpra' }}
   # Add linux/arm64 if xpra.org publishes arm64 packages for noble
   PLATFORMS: linux/amd64
@@ -28,15 +27,16 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: read
+      packages: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-qemu-action@v4
 
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
 
       - name: Build image for testing
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           load: true
@@ -73,25 +73,25 @@ jobs:
 
       - name: Docker metadata
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.IMAGE }}
           tags: |
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=raw,value=${{ steps.version.outputs.xpra }},enable={{is_default_branch}}
-            type=ref,event=branch
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') }}
+            type=raw,value=${{ steps.version.outputs.xpra }},enable=${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') }}
+            type=ref,event=tag
             type=ref,event=pr
-            type=semver,pattern={{version}}
 
-      - name: Log in to Docker Hub
+      - name: Log in to GitHub Container Registry
         if: github.event_name != 'pull_request'
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           platforms: ${{ env.PLATFORMS }}
