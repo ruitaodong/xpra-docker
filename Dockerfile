@@ -2,15 +2,18 @@
 # (Ubuntu's own package is the outdated 3.1.5)
 FROM ubuntu:24.04
 
-# "xpra" = stable channel, "xpra-beta" = beta channel
+# "xpra" = stable, "xpra-lts" = long-term support, "xpra-beta" = beta
 ARG XPRA_CHANNEL=xpra
 ENV DEBIAN_FRONTEND=noninteractive
 
+# The repo definition comes from Xpra's GitHub repo; the signing key from xpra.org.
+# curl -f makes a missing file fail loudly instead of wget's silent exit code 8.
 RUN apt-get update \
- && apt-get install -y --no-install-recommends ca-certificates wget \
- && wget -qO /usr/share/keyrings/xpra.asc https://xpra.org/xpra.asc \
- && wget -qO /etc/apt/sources.list.d/xpra.sources \
-      "https://xpra.org/repos/noble/${XPRA_CHANNEL}.sources" \
+ && apt-get install -y --no-install-recommends ca-certificates curl \
+ && curl -fsSL --retry 3 -o /usr/share/keyrings/xpra.asc https://xpra.org/xpra.asc \
+ && curl -fsSL --retry 3 -o /etc/apt/sources.list.d/xpra.sources \
+      "https://raw.githubusercontent.com/Xpra-org/xpra/master/packaging/repos/noble/${XPRA_CHANNEL}.sources" \
+ && cat /etc/apt/sources.list.d/xpra.sources \
  && apt-get update \
  && apt-get install -y xpra xpra-html5 xterm dbus-x11 \
  && rm -rf /var/lib/apt/lists/*
