@@ -18,18 +18,20 @@ RUN apt-get update \
  && apt-get install -y xpra xpra-html5 xterm dbus-x11 \
  && rm -rf /var/lib/apt/lists/*
 
-# Replace the image's default "ubuntu" user (uid 1000) with an "xpra" user
+# Replace the image's default "ubuntu" user (uid 1000) with an "app" user.
+# (The xpra package already creates an "xpra" group, so that name is taken.)
 RUN (userdel -r ubuntu 2>/dev/null || true) \
- && useradd -m -u 1000 -s /bin/bash xpra \
+ && useradd -m -u 1000 -s /bin/bash app \
+ && (getent group xpra >/dev/null && usermod -aG xpra app || true) \
  && mkdir -p /run/xpra /run/user/1000 \
- && chown xpra:xpra /run/user/1000 \
+ && chown app:app /run/user/1000 \
  && chmod 700 /run/user/1000 \
  && chmod 1777 /run/xpra
 
 COPY --chmod=755 entrypoint.sh /usr/local/bin/xpra-entrypoint
 
-USER xpra
-WORKDIR /home/xpra
+USER app
+WORKDIR /home/app
 ENV XDG_RUNTIME_DIR=/run/user/1000 \
     XPRA_DISPLAY=:100 \
     XPRA_PORT=14500 \
