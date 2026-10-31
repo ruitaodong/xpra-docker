@@ -1,0 +1,591 @@
+Usage: 
+	xpra 
+	xpra start [DISPLAY]
+	xpra start-desktop [DISPLAY]
+	xpra upgrade [DISPLAY]
+	xpra shadow [DISPLAY]
+	xpra attach [DISPLAY]
+	xpra detach [DISPLAY]
+	xpra info [DISPLAY]
+	xpra version [DISPLAY]
+	xpra stop [DISPLAY]
+	xpra exit [DISPLAY]
+	xpra screenshot filename [DISPLAY]
+	xpra control DISPLAY command [arg1] [arg2]..
+	xpra print DISPLAY filename
+	xpra showconfig
+	xpra list
+	xpra list-windows
+	xpra sessions
+	xpra launcher
+	xpra list-mdns
+	xpra mdns-gui
+
+
+Options:
+  --version             show program's version number and exit
+  -h, --help            show this help message and exit
+  --tray=yes|no         Enable Xpra's own system tray menu. Default: yes
+  --delay-tray=yes|no   Waits for the first events before showing the system
+                        tray. Default: no
+
+  Server Options:
+    These options are only relevant on the server when using the 'start'
+    or 'start-desktop' or 'upgrade' or 'shadow' mode.
+
+    --start=CMD         program to spawn in server (may be repeated). Default:
+                        [].
+    --start-child=CMD   program to spawn in server, taken into account by the
+                        exit-with-children option (may be repeated to run
+                        multiple commands). Default: [].
+    --start-after-connect=START_AFTER_CONNECT
+                        program to spawn in server after the first client has
+                        connected (may be repeated). Default: [].
+    --start-child-after-connect=START_CHILD_AFTER_CONNECT
+                        program to spawn in server after the first client has
+                        connected, taken into account by the exit-with-
+                        children option (may be repeated to run multiple
+                        commands). Default: [].
+    --start-on-connect=START_ON_CONNECT
+                        program to spawn in server every time a client
+                        connects (may be repeated). Default: [].
+    --start-child-on-connect=START_CHILD_ON_CONNECT
+                        program to spawn in server every time a client
+                        connects, taken into account by the exit-with-children
+                        option (may be repeated). Default: [].
+    --start-on-last-client-exit=START_ON_LAST_CLIENT_EXIT
+                        program to spawn in server every time a client
+                        disconnects and there are no other clients left (may
+                        be repeated). Default: [].
+    --start-child-on-last-client-exit=START_CHILD_ON_LAST_CLIENT_EXIT
+                        program to spawn in server every time a client
+                        disconnects and there are no other clients left, taken
+                        into account by the exit-with-children option (may be
+                        repeated). Default: [].
+    --exec-wrapper=CMD  Wrapper for executing commands. Default: .
+    --terminate-children=yes|no
+                        Terminate all the child commands on server stop.
+                        Default: False
+    --exit-with-children=yes|no
+                        Terminate the server when the last --start-child
+                        command(s) exit
+    --start-new-commands=yes|no
+                        Allows clients to execute new commands on the server.
+                        Default: yes.
+    --start-via-proxy=yes|no|auto
+                        Start servers via the system proxy server. Default:
+                        False.
+    --proxy-start-sessions=yes|no
+                        Allows proxy servers to start new sessions on demand.
+                        Default: yes.
+    --dbus-launch=CMD   Start the session within a dbus-launch context, leave
+                        empty to turn off. Default: dbus-launch --sh-syntax
+                        --close-stderr.
+    --source=SOURCE     Script to source into the server environment. Default:
+                        .
+    --source-start=SOURCE_START
+                        Script to source into the environment used for
+                        starting commands. Default: .
+    --start-env=START_ENV
+                        Define environment variables used with 'start-child'
+                        and 'start', can be specified multiple times. Default:
+                        'UBUNTU_MENUPROXY=', 'QT_X11_NO_NATIVE_MENUBAR=1',
+                        'MWNOCAPTURE=true', 'MWNO_RIT=true', 'MWWM=allwm',
+                        'GDK_BACKEND=x11', 'QT_QPA_PLATFORM=xcb', 'GTK_CSD=0',
+                        'NO_AT_BRIDGE=1'.
+    --systemd-run=yes|no|auto
+                        Wrap server start commands with systemd-run. Default:
+                        auto.
+    --systemd-run-args=ARGS
+                        Command line arguments passed to systemd-run. Default:
+                        ''.
+    --tcp-proxy=HOST:PORT
+                        The address to which non-xpra packets will be
+                        forwarded. Default: ''.
+    --html=on|off|[HOST:]PORT
+                        Enable the web server and the html5 client. Default:
+                        'auto'.
+    --daemon=yes|no     Daemonize when running as a server (default: yes)
+    --chdir=DIR         Change to this directory (default: no)
+    --pidfile=PIDFILE   Write the process id to this file (default: '')
+    --log-dir=LOG_DIR   The directory where log files are placed
+    --log-file=LOG_FILE
+                        When daemonizing, this is where the log messages will
+                        go. Default: '$DISPLAY.log'. If a relative filename is
+                        specified the it is relative to --log-dir, the value
+                        of '$DISPLAY' will be substituted with the actual
+                        display used
+    --attach=yes|no|auto
+                        Attach a client as soon as the server has started
+                        (default: auto)
+    --file-transfer=yes|no|ask
+                        Support file transfers. Default: yes.
+    --open-files=yes|no|ask
+                        Automatically open uploaded files (potentially
+                        dangerous). Default: 'auto'.
+    --open-url=yes|no|ask
+                        Automatically open URL (potentially dangerous).
+                        Default: 'auto'.
+    --printing=yes|no|ask
+                        Support printing. Default: yes.
+    --lpadmin=COMMAND   Specify the lpadmin command to use. Default:
+                        '/usr/sbin/lpadmin'.
+    --lpinfo=COMMAND    Specify the lpinfo command to use. Default:
+                        '/usr/sbin/lpinfo'.
+    --exit-with-client=yes|no
+                        Terminate the server when the last client disconnects.
+                        Default: no
+    --idle-timeout=IDLE_TIMEOUT
+                        Disconnects the client when idle (0 to disable).
+                        Default: 0 seconds
+    --server-idle-timeout=SERVER_IDLE_TIMEOUT
+                        Exits the server when idle (0 to disable). Default: 0
+                        seconds
+    --use-display=yes|no
+                        Use an existing display rather than starting one with
+                        the xvfb command. Default: no
+    --xvfb=CMD          How to run the headless X server. Default: 'Xvfb
+                        +extension GLX +extension Composite -screen 0
+                        5760x2560x24+32 -dpi 96 -nolisten tcp -noreset -auth
+                        $XAUTHORITY'.
+    --displayfd=FD      The xpra server will write the display number back on
+                        this file descriptor as a newline-terminated string.
+    --fake-xinerama=path|auto|no
+                        Setup fake xinerama support for the session. You can
+                        specify the path to the libfakeXinerama.so library or
+                        a boolean. Default: yes.
+    --resize-display=yes|no
+                        Whether the server display should be resized to match
+                        the client resolution. Default: yes.
+    --bind=SOCKET       Listen for connections over unix domain sockets. You
+                        may specify this option multiple times to listen on
+                        different locations. Default: auto
+    --bind-tcp=[HOST]:[PORT]
+                        Listen for connections over TCP. Use --tcp-auth to
+                        secure it. You may specify this option multiple times
+                        with different host and port combinations
+    --bind-udp=[HOST]:[PORT]
+                        Listen for connections over UDP. Use --udp-auth to
+                        secure it. You may specify this option multiple times
+                        with different host and port combinations
+    --bind-ws=[HOST]:[PORT]
+                        Listen for connections over Websocket. Use --ws-auth
+                        to secure it. You may specify this option multiple
+                        times with different host and port combinations
+    --bind-wss=[HOST]:[PORT]
+                        Listen for connections over HTTPS / wss (secure
+                        Websocket). Use --wss-auth to secure it. You may
+                        specify this option multiple times with different host
+                        and port combinations
+    --bind-ssl=[HOST]:PORT
+                        Listen for connections over SSL. Use --ssl-auth to
+                        secure it. You may specify this option multiple times
+                        with different host and port combinations
+    --bind-ssh=[HOST]:PORT
+                        Listen for connections using SSH transport. Use --ssh-
+                        auth to secure it. You may specify this option
+                        multiple times with different host and port
+                        combinations
+    --bind-rfb=[HOST]:PORT
+                        Listen for RFB connections. Use --rfb-auth to secure
+                        it. You may specify this option multiple times with
+                        different host and port combinations
+    --bind-vsock=[CID]:[PORT]
+                        Listen for connections over VSOCK. You may specify
+                        this option multiple times with different CID and port
+                        combinations
+    --mdns=yes|no       Publish the session information via mDNS. Default:
+                        yes.
+    --pulseaudio=yes|no|auto
+                        Start a pulseaudio server for the session. Default:
+                        auto.
+    --pulseaudio-command=PULSEAUDIO_COMMAND
+                        The command used to start the pulseaudio server.
+                        Default: 'pulseaudio --start -n --daemonize=false
+                        --system=false --exit-idle-time=-1 --load=module-
+                        suspend-on-idle '--load=module-null-sink
+                        sink_name="Xpra-Speaker"
+                        sink_properties=device.description="Xpra\ Speaker"' '
+                        --load=module-null-sink sink_name="Xpra-Microphone"
+                        sink_properties=device.description="Xpra\ Microphone"'
+                        '--load=module-native-protocol-unix
+                        socket=$XPRA_PULSE_SERVER' --load=module-dbus-protocol
+                        --load=module-x11-publish --log-level=2 --log-
+                        target=stderr'.
+    --pulseaudio-configure-commands=PULSEAUDIO_CONFIGURE_COMMANDS
+                        The commands used to configure the pulseaudio server.
+                        Default: '['pactl set-default-sink Xpra-Speaker',
+                        'pactl set-default-source Xpra-Microphone.monitor']'.
+    --dbus-proxy=yes|no
+                        Forward dbus calls from the client. Default: yes.
+    --dbus-control=yes|no
+                        Allows the server to be controlled via its dbus
+                        interface. Default: yes.
+
+  Server Controlled Features:
+    These options be specified on the client or on the server, but the
+    server's settings will have precedence over the client's.
+
+    --bandwidth-limit=BANDWIDTH_LIMIT
+                        Limit the bandwidth used. The value is specified in
+                        bits per second, use the value '0' to disable
+                        restrictions. Default: 'auto'.
+    --bandwidth-detection=BANDWIDTH_DETECTION
+                        Automatically detect runtime bandwidth limits.
+                        Default: 'True'.
+    --readonly=yes|no   Disable keyboard input and mouse events from the
+                        clients.  Default: no.
+    --clipboard=yes|no|clipboard-type
+                        Enable clipboard support. Default: yes.
+    --clipboard-direction=to-server|to-client|both
+                        Direction of clipboard synchronization. Default: both.
+    --notifications=yes|no
+                        Forwarding of system notifications. Default: yes.
+    --system-tray=yes|no
+                        Forward of system tray icons. Default: yes.
+    --cursors=yes|no    Forward custom application mouse cursors. Default:
+                        yes.
+    --bell=yes|no       Forward the system bell. Default: yes.
+    --webcam=WEBCAM     Webcam forwarding, can be used to specify a device.
+                        Default: auto.
+    --mousewheel=MOUSEWHEEL
+                        Mouse wheel forwarding, can be used to disable the
+                        device or invert some axes. Default: on.
+    --input-devices=APINAME
+                        Which API to use for input devices. Default: auto.
+    --global-menus=yes|no
+                        Forward application global menus. Default: yes.
+    --xsettings=yes|no  xsettings synchronization. Default: yes.
+    --mmap=yes|no|mmap-filename
+                        Use memory mapped transfers for local connections.
+                        Default: yes.
+    --sharing=yes|no    Allow more than one client to connect to the same
+                        session.  Default: auto.
+    --lock=yes|no       Prevent sessions from being taken over by new clients.
+                        Default: auto.
+    --remote-logging=yes|no|both
+                        Forward all the client's log output to the server.
+                        Default: yes.
+    --speaker=on|off|disabled
+                        Forward sound output to the client(s). Default: off.
+    --speaker-codec=SPEAKER_CODEC
+                        Specify the codec(s) to use for forwarding the speaker
+                        sound output.     This parameter can be specified
+                        multiple times and the order in which the codecs
+                        are specified defines the preferred codec order.
+                        Use the special value 'help' to get a list of options.
+                        When unspecified, all the available codecs are allowed
+                        and the first one is used.
+    --microphone=on|off|disabled
+                        Forward sound input to the server. Default: off.
+    --microphone-codec=MICROPHONE_CODEC
+                        Specify the codec(s) to use for forwarding the
+                        microphone sound output.     This parameter can be
+                        specified multiple times and the order in which the
+                        codecs     are specified defines the preferred codec
+                        order.     Use the special value 'help' to get a list
+                        of options.     When unspecified, all the available
+                        codecs are allowed and the first one is used.
+    --sound-source=SOUND_SOURCE
+                        Specifies which sound system to use to capture the
+                        sound stream  (use 'help' for options)
+    --av-sync=AV_SYNC   Try to synchronize sound and video. Default: yes.
+
+  Encoding and Compression Options:
+    These options are used by the client to specify the desired picture
+    and network data compression.They may also be specified on the server
+    as default settings.
+
+    --encodings=ENCODINGS
+                        Specify which encodings are allowed. Default: all.
+    --encoding=ENCODING
+                        Which image compression algorithm to use, specify
+                        'help' to get a list of options. Default: auto.
+    --video-encoders=VIDEO_ENCODERS
+                        Specify which video encoders to enable, to get a list
+                        of all the options specify 'help'
+    --proxy-video-encoders=PROXY_VIDEO_ENCODERS
+                        Specify which video encoders to enable when running a
+                        proxy server, to get a list of all the options specify
+                        'help'
+    --csc-modules=CSC_MODULES
+                        Specify which colourspace conversion modules to
+                        enable, to get a list of all the options specify
+                        'help'. Default: ['all'].
+    --video-decoders=VIDEO_DECODERS
+                        Specify which video decoders to enable, to get a list
+                        of all the options specify 'help'
+    --video-scaling=SCALING
+                        How much automatic video downscaling should be used,
+                        from 1 (rarely) to 100 (aggressively), 0 to disable.
+                        Default: auto.
+    --min-quality=MIN-LEVEL
+                        Sets the minimum encoding quality allowed in automatic
+                        quality setting, from 1 to 100, 0 to leave unset.
+                        Default: 30.
+    --quality=LEVEL     Use a fixed image compression quality - only relevant
+                        for lossy encodings, from 1 to 100, 0 to use automatic
+                        setting. Default: 0.
+    --min-speed=SPEED   Sets the minimum encoding speed allowed in automatic
+                        speed setting,from 1 to 100, 0 to leave unset.
+                        Default: 30.
+    --speed=SPEED       Use image compression with the given encoding speed,
+                        from 1 to 100, 0 to use automatic setting. Default: 0.
+    --auto-refresh-delay=DELAY
+                        Idle delay in seconds before doing an automatic
+                        lossless refresh. 0.0 to disable. Default: 0.15.
+    --compressors=COMPRESSORS
+                        The packet compressors to enable. Default: lz4, lzo,
+                        zlib, brotli.
+    --packet-encoders=PACKET_ENCODERS
+                        The packet encoders to enable. Default: rencode,
+                        rencodeplus, bencode, yaml.
+    -z LEVEL, --compression_level=LEVEL
+                        How hard to work on compressing packet data. You
+                        generally do not need to use this option, the default
+                        value should be adequate, picture data is compressed
+                        separately (see --encoding). 0 to disable compression,
+                        9 for maximal (slowest) compression. Default: 1.
+
+  Client Features Options:
+    These options control client features that affect the appearance or
+    the keyboard.
+
+    --opengl=(yes|no|auto)[:backends]
+                        Use OpenGL accelerated rendering. Default: probe.
+    --windows=yes|no    Forward windows. Default: yes.
+    --session-name=SESSION_NAME
+                        The name of this session, which may be used in
+                        notifications, menus, etc. Default: 'Xpra'.
+    --min-size=MIN_SIZE
+                        The minimum size for normal decorated windows, ie:
+                        100x20. Default: ''.
+    --max-size=MAX_SIZE
+                        The maximum size for normal windows, ie: 800x600.
+                        Default: ''.
+    --desktop-scaling=SCALING
+                        How much to scale the client desktop by. This value
+                        can be specified in the form of absolute pixels:
+                        "WIDTHxHEIGHT" as a fraction: "3/2" or just as a
+                        decimal number: "1.5". You can also specify each
+                        dimension individually: "2x1.5". Default: 'auto'.
+    --desktop-fullscreen=DESKTOP_FULLSCREEN
+                        Make the window fullscreen if it is from a desktop or
+                        shadow server, scaling it to fit the screen. Default:
+                        'False'.
+    --border=BORDER     The border to draw inside xpra windows to distinguish
+                        them from local windows.Format: color[,size]. Default:
+                        'auto,5:off'
+    --title=TITLE       Text which is shown as window title, may use remote
+                        metadata variables. Default: '@title@ on @hostname@'.
+    --window-close=WINDOW_CLOSE
+                        The action to take when a window is closed by the
+                        client. Valid options are: 'forward', 'ignore',
+                        'disconnect'. Default: 'auto'.
+    --window-icon=WINDOW_ICON
+                        Path to the default image which will be used for all
+                        windows (the application may override this)
+    --tray-icon=TRAY_ICON
+                        Path to the image which will be used as icon for the
+                        system-tray or dock
+    --shortcut-modifiers=SHORTCUT_MODIFIERS
+                        Default set of modifiers required by the key
+                        shortcuts. Default auto.
+    --key-shortcut=KEY_SHORTCUT
+                        Define key shortcuts that will trigger specific
+                        actions.If no shortcuts are defined, it defaults to:
+                        Control+Menu:toggle_keyboard_grab
+                        Shift+Menu:toggle_pointer_grab
+                        Shift+F11:toggle_fullscreen  #+F1:show_menu
+                        #+F2:show_start_new_command  #+F3:show_bug_report
+                        #+F4:quit  #+F5:increase_quality
+                        #+F6:decrease_quality  #+F7:increase_speed
+                        #+F8:decrease_speed  #+F10:magic_key
+                        #+F11:show_session_info  #+F12:toggle_debug
+                        #+plus:scaleup  #+minus:scaledown
+                        #+underscore:scaledown  #+KP_Add:scaleup
+                        #+KP_Subtract:scaledown  #+KP_Multiply:scalereset
+                        #+bar:scalereset  #+question:scalingoff
+    --keyboard-sync=yes|no
+                        Synchronize keyboard state. Default: yes.
+    --keyboard-raw=yes|no
+                        Send raw keyboard keycodes. Default: no.
+    --keyboard-layout=LAYOUT
+                        The keyboard layout to use. Default: .
+    --keyboard-layouts=LAYOUTS
+                        The keyboard layouts to enable. Default: .
+    --keyboard-variant=VARIANT
+                        The keyboard layout variant to use. Default: .
+    --keyboard-variants=VARIANTS
+                        The keyboard layout variants to enable. Default: .
+    --keyboard-options=OPTIONS
+                        The keyboard layout options to use. Default: .
+
+  SSL Options:
+    These options apply to both client and server. Please refer to the man
+    page for details.
+
+    --ssl=SSL           Whether to enable SSL on TCP sockets and for what
+                        purpose (requires 'ssl-cert'). Default: 'yes'.
+    --ssl-key=SSL_KEY   Key file to use. Default: ''.
+    --ssl-cert=SSL_CERT
+                        Certifcate file to use. Default: ''.
+    --ssl-protocol=SSL_PROTOCOL
+                        Specifies which version of the SSL protocol to use.
+                        Default: 'TLSv1_2'.
+    --ssl-ca-certs=SSL_CA_CERTS
+                        The ca_certs file contains a set of concatenated
+                        'certification authority' certificates, or you can set
+                        this to a directory containing CAs files. Default:
+                        'default'.
+    --ssl-ca-data=SSL_CA_DATA
+                        PEM or DER encoded certificate data, optionally
+                        converted to hex. Default: ''.
+    --ssl-ciphers=SSL_CIPHERS
+                        Sets the available ciphers,  it should be a string in
+                        the OpenSSL cipher list format. Default: 'DEFAULT'.
+    --ssl-client-verify-mode=SSL_CLIENT_VERIFY_MODE
+                        Whether to try to verify the client's certificates and
+                        how to behave if verification fails. Default:
+                        'optional'.
+    --ssl-server-verify-mode=SSL_SERVER_VERIFY_MODE
+                        Whether to try to verify the server's certificates and
+                        how to behave if verification fails.  Default:
+                        'required'.
+    --ssl-verify-flags=SSL_VERIFY_FLAGS
+                        The flags for certificate verification operations.
+                        Default: 'X509_STRICT'.
+    --ssl-check-hostname=yes|no
+                        Whether to match the peer cert's hostname or accept
+                        any host, dangerous. Default: 'yes'.
+    --ssl-server-hostname=hostname
+                        The server hostname to match. Default: ''.
+    --ssl-options=options
+                        Set of SSL options enabled on this context. Default:
+                        'ALL,NO_COMPRESSION'.
+
+  Advanced Options:
+    These options apply to both client and server. Please refer to the man
+    page for details.
+
+    --env=ENV           Define environment variables which will apply to this
+                        process and all subprocesses, can be specified
+                        multiple times. Default: .
+    --challenge-handlers=CHALLENGE_HANDLERS
+                        Which handlers to use for processing server
+                        authentication challenges. Default: all.
+    --password-file=PASSWORD_FILE
+                        The file containing the password required to connect
+                        (useful to secure TCP mode). Default: .
+    --forward-xdg-open=FORWARD_XDG_OPEN
+                        Intercept calls to xdg-open and forward them to the
+                        client. Default: 'True'.
+    --open-command=OPEN_COMMAND
+                        Command to use to open files and URLs. Default:
+                        '/usr/bin/xdg-open'.
+    --modal-windows=MODAL_WINDOWS
+                        Honour modal windows. Default: 'True'.
+    --input-method=INPUT_METHOD
+                        Which X11 input method to configure for client
+                        applications started with start orstart-child
+                        (Default: 'none', options: none, keep, xim, IBus,
+                        SCIM, uim)
+    --dpi=DPI           The 'dots per inch' value that client applications
+                        should try to honour, from 10 to 1000 or 0 for
+                        automatic setting. Default: auto.
+    --pixel-depth=PIXEL_DEPTH
+                        The bits per pixel of the virtual framebuffer when
+                        starting a server (8, 16, 24 or 30), or for rendering
+                        when starting a client.  Default: 0 (auto).
+    --sync-xvfb=SYNC_XVFB
+                        How often to synchronize the virtual framebuffer used
+                        for X11 seamless servers (0 to disable). Default: 0.
+    --socket-dirs=SOCKET_DIRS
+                        Directories to look for the socket files in. Default:
+                        '/run/user/$UID/xpra':'/run/xpra':'~/.xpra'.
+    --socket-dir=SOCKET_DIR
+                        Directory to place/look for the socket files in.
+                        Default: '$XPRA_SOCKET_DIR or the first valid
+                        directory in socket-dirs'.
+    --system-proxy-socket=SYSTEM_PROXY_SOCKET
+                        The socket path to use to contact the system-wide
+                        proxy server. Default: '/run/xpra/system'.
+    --ssh-upgrade=SSH_UPGRADE
+                        Upgrade TCP sockets to handle SSH connections.
+                        Default: 'True'.
+    --rfb-upgrade=RFB_UPGRADE
+                        Upgrade TCP sockets to send a RFB handshake after this
+                        delay (in seconds). Default: '5'.
+    -d FILTER1,FILTER2,..., --debug=FILTER1,FILTER2,...
+                        List of categories to enable debugging for (you can
+                        also use "all" or "help", default: '')
+    --ssh=CMD           How to run ssh. Default: 'auto'.
+    --exit-ssh=yes|no|auto
+                        Terminate SSH when disconnecting. Default: True.
+    --username=USERNAME
+                        The username supplied by the client for
+                        authentication. Default: 'rdong'.
+    --auth=AUTH         The authentication module to use (default: '[]')
+    --tcp-auth=TCP_AUTH
+                        The authentication module to use for TCP sockets
+                        (default: '[]')
+    --udp-auth=UDP_AUTH
+                        The authentication module to use for UDP sockets
+                        (default: '[]')
+    --ws-auth=WS_AUTH   The authentication module to use for Websockets
+                        (default: '[]')
+    --wss-auth=WSS_AUTH
+                        The authentication module to use for Secure Websockets
+                        (default: '[]')
+    --ssl-auth=SSL_AUTH
+                        The authentication module to use for SSL sockets
+                        (default: '[]')
+    --ssh-auth=SSH_AUTH
+                        The authentication module to use for SSH sockets
+                        (default: '[]')
+    --rfb-auth=RFB_AUTH
+                        The authentication module to use for RFB sockets
+                        (default: '[]')
+    --vsock-auth=VSOCK_AUTH
+                        The authentication module to use for vsock sockets
+                        (default: '[]')
+    --min-port=MIN_PORT
+                        The minimum port number allowed when creating UDP or
+                        TCP sockets (default: '1024')
+    --mmap-group=MMAP_GROUP
+                        When creating the mmap file with the client, set the
+                        group permission on the mmap file to this group, use
+                        the special value 'auto' to use the same value as the
+                        owner of the server socket file we connect to
+                        (default: 'auto')
+    --socket-permissions=SOCKET_PERMISSIONS
+                        When creating the server unix domain socket, what file
+                        access mode to use (default: '600')
+    --pings=yes|no      How often to send ping packets (in seconds, use zero
+                        to disable). Default: 5.
+    --clipboard-filter-file=CLIPBOARD_FILTER_FILE
+                        Name of a file containing regular expressions of
+                        clipboard contents  that must be filtered out
+    --local-clipboard=SELECTION
+                        Name of the local clipboard selection to be
+                        synchronized when using the translated clipboard
+                        (default: CLIPBOARD)
+    --remote-clipboard=SELECTION
+                        Name of the remote clipboard selection to be
+                        synchronized when using the translated clipboard
+                        (default: CLIPBOARD)
+    --remote-xpra=CMD   How to run xpra on the remote host. (Default:
+                        $XDG_RUNTIME_DIR/xpra/run-xpra or xpra or
+                        /usr/local/bin/xpra or ~/.xpra/run-xpra)
+    --encryption=ALGO   Specifies the encryption cipher to use, specify 'help'
+                        to get a list of options. (default: None)
+    --encryption-keyfile=FILE
+                        Specifies the file containing the encryption key.
+                        (Default: '')
+    --tcp-encryption=ALGO
+                        Specifies the encryption cipher to use for TCP
+                        sockets, specify 'help' to get a list of options.
+                        (default: None)
+    --tcp-encryption-keyfile=FILE
+                        Specifies the file containing the encryption key to
+                        use for TCP sockets. (default: '')
