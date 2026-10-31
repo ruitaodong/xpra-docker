@@ -31,4 +31,9 @@ exec xpra start :100\
   --remote-logging=no \
   --sharing=no \
   --av-sync=no \
-  --video-encoders=vpx,x264 $@
+  --video-encoders=vpx,x264\
+  --encodings=vp9,vp8,x264,rgb\
+  --keyboard-sync=no\
+  "$@"
+
+#--swap-keys=no

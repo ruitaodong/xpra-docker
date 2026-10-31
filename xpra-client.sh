@@ -17,5 +17,6 @@ exec xpra\
   --pulseaudio=no \
   --speaker=no \
   --microphone=no \
-  --encodings=vpx,x264\
+  --encodings=vpx,x264,rgb\
   "$@"    
+

@@ -28,8 +28,6 @@ RUN (userdel -r ubuntu 2>/dev/null || true) \
  && chmod 700 /run/user/1000 \
  && chmod 1777 /run/xpra
 
-COPY --chmod=755 entrypoint.sh /usr/local/bin/xpra-entrypoint
-
 USER app
 WORKDIR /home/app
 ENV XDG_RUNTIME_DIR=/run/user/1000 \
@@ -38,4 +36,3 @@ ENV XDG_RUNTIME_DIR=/run/user/1000 \
     XPRA_START=xterm
 
 EXPOSE 14500
-ENTRYPOINT ["/usr/local/bin/xpra-entrypoint"]

@@ -1,10 +1,12 @@
-name: Build and push Xpra image
+name: Server image
 
 on:
   push:
     branches: [main]
-    tags: ["v*"]
+    tags: ["*"]
+    paths-ignore: ["client/**", ".github/workflows/client.yml"]
   pull_request:
+    paths-ignore: ["client/**", ".github/workflows/client.yml"]
   schedule:
     - cron: "0 6 * * 1"   # weekly rebuild to pick up new Xpra releases
   workflow_dispatch:
@@ -14,11 +16,17 @@ on:
         type: choice
         options: [xpra, xpra-lts, xpra-beta]
         default: xpra
+      no_cache:
+        description: "Rebuild from scratch (fetch the newest Xpra packages)"
+        type: boolean
+        default: true
 
 env:
   # Published to GitHub Container Registry; no extra secrets needed
   IMAGE: ghcr.io/${{ github.repository }}
   XPRA_CHANNEL: ${{ inputs.channel || 'xpra' }}
+  # Scheduled and manual runs skip the layer cache so apt really fetches new Xpra releases
+  NO_CACHE: ${{ github.event_name == 'schedule' || inputs.no_cache == true }}
   # Add linux/arm64 if xpra.org publishes arm64 packages for noble
   PLATFORMS: linux/amd64
 
@@ -42,8 +50,9 @@ jobs:
           load: true
           tags: xpra-test:ci
           build-args: XPRA_CHANNEL=${{ env.XPRA_CHANNEL }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          no-cache: ${{ env.NO_CACHE == 'true' }}
+          cache-from: type=gha,scope=server
+          cache-to: type=gha,scope=server,mode=max
 
       - name: Check Xpra version is 5 or newer
         id: version
@@ -67,9 +76,16 @@ jobs:
             fi
             sleep 2
           done
-          docker logs xpra-smoke
+          sleep 5
+          running=$(docker inspect -f '{{.State.Running}}' xpra-smoke)
+          docker logs xpra-smoke > smoke.log 2>&1 || true
+          cat smoke.log
           docker rm -f xpra-smoke
           [ "$ok" = 1 ] || { echo "::error::Server did not come up"; exit 1; }
+          [ "$running" = true ] || { echo "::error::Server exited after starting"; exit 1; }
+          if grep -qE "Traceback|cannot start" smoke.log; then
+            echo "::error::Server log contains errors"; exit 1
+          fi
 
       - name: Docker metadata
         id: meta
@@ -99,5 +115,5 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: XPRA_CHANNEL=${{ env.XPRA_CHANNEL }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=server
+          cache-to: type=gha,scope=server,mode=max
