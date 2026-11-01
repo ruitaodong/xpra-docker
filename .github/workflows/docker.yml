@@ -7,8 +7,6 @@ on:
     paths-ignore: ["client/**", ".github/workflows/client.yml"]
   pull_request:
     paths-ignore: ["client/**", ".github/workflows/client.yml"]
-  schedule:
-    - cron: "0 6 * * 1"   # weekly rebuild to pick up new Xpra releases
   workflow_dispatch:
     inputs:
       channel:
@@ -25,8 +23,8 @@ env:
   # Published to GitHub Container Registry; no extra secrets needed
   IMAGE: ghcr.io/${{ github.repository }}
   XPRA_CHANNEL: ${{ inputs.channel || 'xpra' }}
-  # Scheduled and manual runs skip the layer cache so apt really fetches new Xpra releases
-  NO_CACHE: ${{ github.event_name == 'schedule' || inputs.no_cache == true }}
+  # Manual runs skip the layer cache by default so apt really fetches new Xpra releases
+  NO_CACHE: ${{ inputs.no_cache == true }}
   # Add linux/arm64 if xpra.org publishes arm64 packages for noble
   PLATFORMS: linux/amd64
 

@@ -1,17 +1,15 @@
 #!/bin/sh
 
 unset DBUS_SESSION_BUS_ADDRESS
-
 unset XDG_CURRENT_DESKTOP
-
 unset XDG_SEAT
 
-exec xpra start :100\
-  --start=xterm\
-  --bind-tcp=0.0.0.0:14500\
-  --tcp-auth=none\
-  --daemon=no\
-  --mdns=no\
+exec xpra start :100 \
+  --start=xterm \
+  --bind-tcp=0.0.0.0:14500 \
+  --tcp-auth=none \
+  --daemon=no \
+  --mdns=no \
   --dbus-launch=no \
   --dbus-proxy=no \
   --webcam=no \
@@ -31,9 +29,9 @@ exec xpra start :100\
   --remote-logging=no \
   --sharing=no \
   --av-sync=no \
-  --video-encoders=vpx,x264\
-  --encodings=vp9,vp8,x264,rgb\
-  --keyboard-sync=no\
+  --video-encoders=vpx,x264 \
+  --encodings=vp9,vp8,h264,rgb \
+  --keyboard-sync=no \
   "$@"
 
 #--swap-keys=no
