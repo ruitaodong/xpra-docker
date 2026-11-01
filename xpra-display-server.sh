@@ -1,4 +1,6 @@
-docker run --rm \
+#!/bin/sh
+
+docker run --rm -d\
   --name xpra-display-server \
   --hostname=$(hostname)\
   --device /dev/dri\

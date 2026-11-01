@@ -7,8 +7,6 @@ on:
     paths: ["client/**", ".github/workflows/client.yml"]
   pull_request:
     paths: ["client/**", ".github/workflows/client.yml"]
-  schedule:
-    - cron: "30 6 * * 1"   # weekly rebuild to pick up new Xpra releases
   workflow_dispatch:
     inputs:
       channel:
