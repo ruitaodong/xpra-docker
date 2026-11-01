@@ -13,7 +13,7 @@ docker run --rm \
     start :100\
     --bind-tcp=0.0.0.0:14500\
     --tcp-auth=none\
-    --html=no\
+    --html=on\
     --daemon=no\
     --exit-with-children=no\
     --pulseaudio=no\
