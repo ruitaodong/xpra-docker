@@ -14,7 +14,7 @@ ADD --chmod=0644 https://raw.githubusercontent.com/Xpra-org/xpra/master/packagin
 # The repo definition comes from Xpra's GitHub repo; the signing key from xpra.org.
 # curl -f makes a missing file fail loudly instead of wget's silent exit code 8.
 RUN apt-get update \
- && apt-get install -y --no-install-recommends xpra xpra-html5 xterm xfonts-75dpi
+ && apt-get install -y --no-install-recommends xpra xpra-html5 xterm xfonts-75dpi\
  && rm -rf /var/lib/apt/lists/*
 
 
