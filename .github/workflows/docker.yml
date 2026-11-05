@@ -67,7 +67,9 @@ jobs:
 
       - name: Smoke test the server
         run: |
-          # The image has no default command; start it the way xpra-display-server.sh does
+          # The image has no default command; start it the way xpra-display-server.sh does.
+          # No D-Bus, using only options that exist in both Xpra 5.1 (LTS) and 6.x
+          # (--dbus=no is 6.x-only; XPRA_IBUS=0 is ignored by 5.1).
           docker run -d --name xpra-smoke -p 14500:14500 \
             -e XPRA_IBUS=0 \
             --entrypoint xpra xpra-test:ci \
@@ -76,7 +78,7 @@ jobs:
             --html=on --daemon=no --exit-with-children=no \
             --start=xterm \
             --pulseaudio=no --speaker=off --microphone=off \
-            --mdns=no --dbus=no --dbus-control=no --notifications=no
+            --mdns=no --dbus-launch= --dbus-control=no --dbus-proxy=no --notifications=no
           for i in $(seq 1 30); do
             if curl -fsS -o /dev/null http://localhost:14500/; then
               echo "HTML5 client is being served"; ok=1; break
