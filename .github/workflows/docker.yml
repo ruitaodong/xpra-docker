@@ -12,8 +12,8 @@ on:
       channel:
         description: "Xpra repository channel"
         type: choice
-        options: [xpra, xpra-lts, xpra-beta]
-        default: xpra
+        options: [xpra-lts, xpra, xpra-beta]
+        default: xpra-lts
       no_cache:
         description: "Rebuild from scratch (fetch the newest Xpra packages)"
         type: boolean
@@ -22,7 +22,7 @@ on:
 env:
   # Published to GitHub Container Registry; no extra secrets needed
   IMAGE: ghcr.io/${{ github.repository }}
-  XPRA_CHANNEL: ${{ inputs.channel || 'xpra' }}
+  XPRA_CHANNEL: ${{ inputs.channel || 'xpra-lts' }}
   # Manual runs skip the layer cache by default so apt really fetches new Xpra releases
   NO_CACHE: ${{ inputs.no_cache == true }}
   # Add linux/arm64 if xpra.org publishes arm64 packages for noble
@@ -67,7 +67,16 @@ jobs:
 
       - name: Smoke test the server
         run: |
-          docker run -d --name xpra-smoke -p 14500:14500 xpra-test:ci
+          # The image has no default command; start it the way xpra-display-server.sh does
+          docker run -d --name xpra-smoke -p 14500:14500 \
+            -e XPRA_IBUS=0 \
+            --entrypoint xpra xpra-test:ci \
+            start :100 \
+            --bind-tcp=0.0.0.0:14500 --tcp-auth=none \
+            --html=on --daemon=no --exit-with-children=no \
+            --start=xterm \
+            --pulseaudio=no --speaker=off --microphone=off \
+            --mdns=no --dbus=no --dbus-control=no --notifications=no
           for i in $(seq 1 30); do
             if curl -fsS -o /dev/null http://localhost:14500/; then
               echo "HTML5 client is being served"; ok=1; break

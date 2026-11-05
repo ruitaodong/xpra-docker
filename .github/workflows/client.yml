@@ -22,7 +22,7 @@ on:
 env:
   IMAGE: ghcr.io/${{ github.repository }}-client
   XPRA_CHANNEL: ${{ inputs.channel || 'xpra-lts' }}
-  NO_CACHE: ${{ github.event_name == 'schedule' || inputs.no_cache == true }}
+  NO_CACHE: ${{ inputs.no_cache == true }}
 
 jobs:
   # Each architecture builds and is tested on its own native runner (no emulation)
@@ -74,8 +74,9 @@ jobs:
             echo "::error::Expected Xpra 5 or newer on ${{ matrix.platform }}, got '$ver'"
             exit 1
           fi
-          docker run --rm --entrypoint test xpra-client-test:ci -x /usr/local/bin/xpra-attach
-          docker run --rm --entrypoint dbus-run-session xpra-client-test:ci -- true
+          # the GTK3 client must be importable (no display needed for the import)
+          docker run --rm --entrypoint python3 xpra-client-test:ci -c \
+            "import gi; gi.require_version('Gtk', '3.0'); import xpra.client.gtk3; print('gtk3 client ok')"
           echo "xpra=$ver" >> "$GITHUB_OUTPUT"
 
       - name: Docker metadata (labels)
