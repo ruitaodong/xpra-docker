@@ -11,7 +11,7 @@ ADD --chmod=0644 https://xpra.org/xpra.asc /usr/share/keyrings/
 ADD --chmod=0644 https://raw.githubusercontent.com/Xpra-org/xpra/master/packaging/repos/noble/${XPRA_CHANNEL}.sources /etc/apt/sources.list.d/
 
 RUN apt-get update \
- && apt-get install -y  --no-install-recommends xpra-client-gtk3 xpra-x11 xpra-codecs iproute2 \
+ && apt-get install -y  --no-install-recommends xpra-client-gtk3 xpra-x11 xpra-codecs openssh-client iproute2 \
  && rm -rf /var/lib/apt/lists/*
 
 
