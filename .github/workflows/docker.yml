@@ -25,12 +25,18 @@ env:
   XPRA_CHANNEL: ${{ inputs.channel || 'xpra-lts' }}
   # Manual runs skip the layer cache by default so apt really fetches new Xpra releases
   NO_CACHE: ${{ inputs.no_cache == true }}
-  # Add linux/arm64 if xpra.org publishes arm64 packages for noble
-  PLATFORMS: linux/amd64
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-24.04
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
       packages: write
