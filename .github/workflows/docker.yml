@@ -20,23 +20,13 @@ on:
         default: true
 
 env:
-  # Published to GitHub Container Registry; no extra secrets needed
   IMAGE: ghcr.io/${{ github.repository }}
   XPRA_CHANNEL: ${{ inputs.channel || 'xpra-lts' }}
-  # Manual runs skip the layer cache by default so apt really fetches new Xpra releases
   NO_CACHE: ${{ inputs.no_cache == true }}
 
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: linux/amd64
-            runner: ubuntu-24.04
-          - platform: linux/arm64
-            runner: ubuntu-24.04-arm
-    runs-on: ${{ matrix.runner }}
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       packages: write
@@ -73,9 +63,6 @@ jobs:
 
       - name: Smoke test the server
         run: |
-          # The image has no default command; start it the way xpra-display-server.sh does.
-          # No D-Bus, using only options that exist in both Xpra 5.1 (LTS) and 6.x
-          # (--dbus=no is 6.x-only; XPRA_IBUS=0 is ignored by 5.1).
           docker run -d --name xpra-smoke -p 14500:14500 \
             -e XPRA_IBUS=0 \
             --entrypoint xpra xpra-test:ci \
@@ -121,11 +108,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push
+      - name: Build and push multi-arch image
         uses: docker/build-push-action@v7
         with:
           context: .
-          platforms: ${{ env.PLATFORMS }}
+          platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
