@@ -1,5 +1,4 @@
 #!/bin/sh
-# Usage: xpra-client.sh attach tcp://mini:14500/ [more options]
 
 unset DBUS_SESSION_BUS_ADDRESS
 unset XDG_CURRENT_DESKTOP
@@ -14,8 +13,11 @@ exec xpra \
   --dbus-proxy=no\
   --mdns=no \
   --notifications=no \
-  --clipboard=yes \
+  --webcam=no \
+  --printing=no \
   --pulseaudio=no \
+  --bell=no \
   --speaker=disabled \
   --microphone=disabled \
+  --ssh="ssh -A -o StrictHostKeyChecking=accept-new"\
   "$@"
