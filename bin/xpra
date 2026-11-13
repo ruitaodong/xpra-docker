@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec docker exec -i xpra-display-server xpra "$@"
