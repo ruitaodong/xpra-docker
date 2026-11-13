@@ -14,5 +14,5 @@ ADD --chmod=0644 https://raw.githubusercontent.com/Xpra-org/xpra/master/packagin
 # but the X11 server cannot start without them
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
-      xpra xpra-x11 xauth xterm xfonts-75dpi xpra-client-gtk3 xpra-codecs openssh-client openssh-server
+      xpra xpra-x11 xauth xterm xfonts-75dpi xpra-client-gtk3 xpra-codecs openssh-client openssh-server\
  && rm -rf /var/lib/apt/lists/*
