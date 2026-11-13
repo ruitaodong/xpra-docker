@@ -1,5 +1,4 @@
 # Xpra server on Ubuntu 24.04 (noble), installed from xpra.org
-# (Ubuntu's own package is the outdated 3.1.5)
 FROM ubuntu:24.04
 
 # "xpra" = stable, "xpra-lts" = long-term support, "xpra-beta" = beta
@@ -15,5 +14,5 @@ ADD --chmod=0644 https://raw.githubusercontent.com/Xpra-org/xpra/master/packagin
 # but the X11 server cannot start without them
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
-      xpra xpra-x11 xpra-html5 xauth xterm xfonts-75dpi \
+      xpra xpra-x11 xauth xterm xfonts-75dpi xpra-client-gtk3 xpra-codecs openssh-client openssh-server
  && rm -rf /var/lib/apt/lists/*
